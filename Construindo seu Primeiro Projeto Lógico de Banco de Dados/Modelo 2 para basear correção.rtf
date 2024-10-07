@@ -1,0 +1,213 @@
+{\rtf1\ansi\ansicpg1252\deff0\nouicompat\deflang1046{\fonttbl{\f0\fnil\fcharset0 Calibri;}}
+{\*\generator Riched20 10.0.14393}\viewkind4\uc1 
+\pard\sa200\sl276\slmult1\f0\fs22\lang22 DROP TABLE IF EXISTS `cliente`;\par
+\par
+CREATE TABLE `cliente` (\par
+  `idCliente` int NOT NULL AUTO_INCREMENT,\par
+  `Minit` char(3) DEFAULT NULL,\par
+  `CEP` int NOT NULL,\par
+  PRIMARY KEY (`idCliente`),\par
+  KEY `CEP_idx` (`CEP`),\par
+  CONSTRAINT `CEP` FOREIGN KEY (`CEP`) REFERENCES `endereco` (`CEP`)\par
+) \par
+\par
+\par
+INSERT INTO `cliente` VALUES (1,NULL,23061220),(2,NULL,23063200);\par
+\par
+DROP TABLE IF EXISTS `cliente_fisico`;\par
+\par
+CREATE TABLE `cliente_fisico` (\par
+  `idCliente_Fisico` int NOT NULL AUTO_INCREMENT,\par
+  `CPF` varchar(45) NOT NULL,\par
+  `Pnome` varchar(45) NOT NULL,\par
+  `Unome` varchar(45) NOT NULL,\par
+  `IdCliente` int NOT NULL,\par
+  PRIMARY KEY (`idCliente_Fisico`),\par
+  UNIQUE KEY `CPF_UNIQUE` (`CPF`),\par
+  KEY `IdCliente_idx` (`IdCliente`),\par
+  CONSTRAINT `IdClienteFis` FOREIGN KEY (`IdCliente`) REFERENCES `cliente` (`idCliente`)\par
+) \par
+\par
+INSERT INTO `cliente_fisico` VALUES (1,'1111111111','Thamyres','Alves',1);\par
+\par
+DROP TABLE IF EXISTS `cliente_juridico`;\par
+\par
+CREATE TABLE `cliente_juridico` (\par
+  `idCliente_Juridico` int NOT NULL AUTO_INCREMENT,\par
+  `CNPJ` varchar(45) NOT NULL,\par
+  `Razao_Social` varchar(45) DEFAULT NULL,\par
+  `IdCliente` int NOT NULL,\par
+  PRIMARY KEY (`idCliente_Juridico`),\par
+  UNIQUE KEY `CNPJ_UNIQUE` (`CNPJ`),\par
+  KEY `IdCliente_idx` (`IdCliente`),\par
+  CONSTRAINT `IdClienteJus` FOREIGN KEY (`IdCliente`) REFERENCES `cliente` (`idCliente`) ON DELETE CASCADE ON UPDATE CASCADE\par
+) \par
+\par
+INSERT INTO `cliente_juridico` VALUES (1,'111111111111','Thamyres Magalh\'e3es',2);\par
+\par
+DROP TABLE IF EXISTS `endereco`;\par
+\par
+CREATE TABLE `endereco` (\par
+  `CEP` int NOT NULL,\par
+  `Valor_Frete` float NOT NULL,\par
+  PRIMARY KEY (`CEP`)\par
+) \par
+\par
+INSERT INTO `endereco` VALUES (23061220,20),(23063200,50);\par
+\par
+DROP TABLE IF EXISTS `entrega`;\par
+\par
+CREATE TABLE `entrega` (\par
+  `idEntrega` int NOT NULL AUTO_INCREMENT,\par
+  `StatusEntrega` enum('Aguardando Envio','Enviado','Entregue','N\'e3o Recebido') NOT NULL DEFAULT 'Aguardando Envio',\par
+  `Codigo_Rastreio` varchar(45) DEFAULT NULL,\par
+  `IdPedido` int NOT NULL,\par
+  PRIMARY KEY (`idEntrega`),\par
+  KEY `idPedido_idx` (`IdPedido`),\par
+  CONSTRAINT `idPedido` FOREIGN KEY (`IdPedido`) REFERENCES `pedido` (`IdPedido`)\par
+) \par
+\par
+INSERT INTO `entrega` VALUES (1,'Enviado','QWER15233',1),(2,'Aguardando Envio',NULL,2);\par
+\par
+DROP TABLE IF EXISTS `estoque`;\par
+\par
+CREATE TABLE `estoque` (\par
+  `idEstoque` int NOT NULL AUTO_INCREMENT,\par
+  `Localizacao` varchar(45) NOT NULL,\par
+  PRIMARY KEY (`idEstoque`)\par
+) \par
+\par
+INSERT INTO `estoque` VALUES (1,'Barra'),(2,'Lagoa'),(3,'Campo Grande');\par
+\par
+DROP TABLE IF EXISTS `formapagamento`;\par
+\par
+CREATE TABLE `formapagamento` (\par
+  `idFormaPagamento` int NOT NULL AUTO_INCREMENT,\par
+  `Descricao` varchar(45) NOT NULL,\par
+  PRIMARY KEY (`idFormaPagamento`)\par
+) \par
+\par
+INSERT INTO `formapagamento` VALUES (1,'Cartao'),(2,'Boleto'),(3,'Dinheiro');\par
+\par
+DROP TABLE IF EXISTS `fornecedor`;\par
+\par
+CREATE TABLE `fornecedor` (\par
+  `idFornecedor` int NOT NULL AUTO_INCREMENT,\par
+  `Razao_Social` varchar(45) NOT NULL,\par
+  `CNPJ` varchar(45) NOT NULL,\par
+  `Contato` char(11) NOT NULL,\par
+  PRIMARY KEY (`idFornecedor`),\par
+  UNIQUE KEY `CNPJ_UNIQUE` (`CNPJ`)\par
+) \par
+\par
+INSERT INTO `fornecedor` VALUES (1,'Barra Shopping','11111111111111','111111111'),(2,'WestShopping','22222222222222','241253689');\par
+\par
+DROP TABLE IF EXISTS `fornecxproduto`;\par
+\par
+CREATE TABLE `fornecxproduto` (\par
+  `idfornecimento` int NOT NULL AUTO_INCREMENT,\par
+  `IdFornecedor` int NOT NULL,\par
+  `IdProduto` int NOT NULL,\par
+  PRIMARY KEY (`idfornecimento`),\par
+  KEY `IdFornecedor_idx` (`IdFornecedor`),\par
+  KEY `IdProduto_idx` (`IdProduto`),\par
+  CONSTRAINT `IdFornecedor` FOREIGN KEY (`IdFornecedor`) REFERENCES `fornecedor` (`idFornecedor`),\par
+  CONSTRAINT `IdProdutos` FOREIGN KEY (`IdProduto`) REFERENCES `produto` (`Idproduto`)\par
+) \par
+\par
+INSERT INTO `fornecxproduto` VALUES (1,1,2),(2,2,3);\par
+\par
+DROP TABLE IF EXISTS `itens_pedido`;\par
+\par
+CREATE TABLE `itens_pedido` (\par
+  `IdItem_Pedido` int NOT NULL AUTO_INCREMENT,\par
+  `IdPedido` int NOT NULL,\par
+  `IdProduto` int NOT NULL,\par
+  `Qtd` int NOT NULL DEFAULT '1',\par
+  PRIMARY KEY (`IdItem_Pedido`),\par
+  KEY `IdPedido_idx` (`IdPedido`),\par
+  KEY `IdProduto_idx` (`IdProduto`),\par
+  CONSTRAINT `IdPedidos` FOREIGN KEY (`IdPedido`) REFERENCES `pedido` (`IdPedido`),\par
+  CONSTRAINT `IdProduto` FOREIGN KEY (`IdProduto`) REFERENCES `produto` (`Idproduto`)\par
+) \par
+\par
+INSERT INTO `itens_pedido` VALUES (1,1,2,5),(2,2,3,2);\par
+\par
+DROP TABLE IF EXISTS `pedido`;\par
+\par
+CREATE TABLE `pedido` (\par
+  `IdPedido` int NOT NULL AUTO_INCREMENT,\par
+  `Descricao` varchar(45) NOT NULL,\par
+  `Status_Pedido` enum('Cancelado','Confirmado','Em Processamento') NOT NULL,\par
+  `IdCliente` int NOT NULL,\par
+  `IdPgto` int NOT NULL,\par
+  PRIMARY KEY (`IdPedido`),\par
+  KEY `IdCliente_idx` (`IdCliente`),\par
+  KEY `IdPgto_idx` (`IdPgto`),\par
+  CONSTRAINT `IdCliente` FOREIGN KEY (`IdCliente`) REFERENCES `cliente` (`idCliente`) ON DELETE CASCADE ON UPDATE CASCADE,\par
+  CONSTRAINT `IdPgto` FOREIGN KEY (`IdPgto`) REFERENCES `formapagamento` (`idFormaPagamento`)\par
+) \par
+\par
+INSERT INTO `pedido` VALUES (1,'Pedido 1','Confirmado',1,1),(2,'Pedido 2','Confirmado',2,2);\par
+\par
+DROP TABLE IF EXISTS `produto`;\par
+\par
+CREATE TABLE `produto` (\par
+  `Idproduto` int NOT NULL AUTO_INCREMENT,\par
+  `Pnome` varchar(45) NOT NULL,\par
+  `Classificacao_infantil` tinyint DEFAULT '0',\par
+  `Categoria` enum('Eletronico','Vestimenta','Brinquedos','Alimentos','Moveis') NOT NULL,\par
+  `Avaliacao` float DEFAULT '0',\par
+  `Tamanho` varchar(10) DEFAULT NULL,\par
+  PRIMARY KEY (`Idproduto`)\par
+) \par
+\par
+INSERT INTO `produto` VALUES (2,'Camiseta',1,'Vestimenta',4,'10'),(3,'Headset',0,'Eletronico',10,NULL);\par
+\par
+DROP TABLE IF EXISTS `qtd_estoque`;\par
+\par
+CREATE TABLE `qtd_estoque` (\par
+  `idQtd_Estoque` int NOT NULL AUTO_INCREMENT,\par
+  `Qtd` int NOT NULL,\par
+  `IdProduto` int NOT NULL,\par
+  `IdEstoque` int NOT NULL,\par
+  PRIMARY KEY (`idQtd_Estoque`),\par
+  KEY `IdProduto_idx` (`IdProduto`),\par
+  KEY `IdEstoque_idx` (`IdEstoque`),\par
+  CONSTRAINT `IdEstoque` FOREIGN KEY (`IdEstoque`) REFERENCES `estoque` (`idEstoque`) ON DELETE CASCADE ON UPDATE CASCADE,\par
+  CONSTRAINT `IdProds` FOREIGN KEY (`IdProduto`) REFERENCES `produto` (`Idproduto`) ON DELETE CASCADE ON UPDATE CASCADE\par
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;\par
+\par
+INSERT INTO `qtd_estoque` VALUES (5,50,2,2),(6,20,3,1),(7,10,3,3);\par
+\par
+DROP TABLE IF EXISTS `terceiros`;\par
+\par
+CREATE TABLE `terceiros` (\par
+  `idTerceiro` int NOT NULL AUTO_INCREMENT,\par
+  `Razao_Social` varchar(45) NOT NULL,\par
+  `Local` varchar(45) NOT NULL,\par
+  PRIMARY KEY (`idTerceiro`),\par
+  UNIQUE KEY `Razao_Social_UNIQUE` (`Razao_Social`)\par
+) \par
+\par
+INSERT INTO `terceiros` VALUES (1,'Terceiro 1','Santa Cruz'),(2,'Terceiro 2','Maguariba');\par
+\par
+DROP TABLE IF EXISTS `tercxprodut`;\par
+\par
+CREATE TABLE `tercxprodut` (\par
+  `idTercxProdut` int NOT NULL AUTO_INCREMENT,\par
+  `IdTerceiro` int NOT NULL,\par
+  `IdProduto` int NOT NULL,\par
+  `Qtd` int NOT NULL,\par
+  PRIMARY KEY (`idTercxProdut`),\par
+  KEY `IdTerceiro_idx` (`IdTerceiro`),\par
+  KEY `IdProduto_idx` (`IdProduto`),\par
+  CONSTRAINT `IdProd` FOREIGN KEY (`IdProduto`) REFERENCES `produto` (`Idproduto`) ON DELETE CASCADE ON UPDATE CASCADE,\par
+  CONSTRAINT `IdTerceiro` FOREIGN KEY (`IdTerceiro`) REFERENCES `terceiros` (`idTerceiro`) ON DELETE CASCADE ON UPDATE CASCADE\par
+) \par
+\par
+INSERT INTO `tercxprodut` VALUES (1,1,2,50),(2,2,3,60);\par
+\par
+MODELO PARA BASEAR CORRE\'c7\'d5ES E ALTERA\'c7\'d5ES, RETIRADO DO GITHUB THAMYRESARM\par
+}
+ 
